@@ -1,0 +1,277 @@
+file order 
+
+1. package.json
+2. .env
+3. config/db.js
+4. models/User.js
+5. controllers/authController.js
+6. routes/authRoutes.js
+7. index.js
+
+run using -> nodemon index.js
+
+1. index.js
+🔹 Main entry point of the backend
+🔹 Connects to MongoDB
+🔹 Starts the Express server
+🔹 Loads routes (like /api/users)
+
+2. routes/userRoutes.js
+🔹 Defines endpoints for authentication
+🔹 /api/users/register → Register
+🔹 /api/users/login → Login
+🔹 Connects to the logic in the controller
+
+3. controllers/authController.js
+🔹 Contains the logic for registering and logging in
+🔹 Handles password hashing, JWT token creation, etc.
+🔹 Uses the User model to talk to the database
+
+4. models/User.js
+🔹 Defines how a User looks in MongoDB
+🔹 Includes name, email, and hashed password
+🔹 Mongoose schema + model
+
+🔗 How They All Connect
+plaintext
+Copy
+Edit
+[Thunder Client / React Frontend]
+          ⬇️ sends POST request to
+      ➤ /api/users/register  or  /login
+
+➤ routes/userRoutes.js
+        ⬇️
+➤ controllers/authController.js
+        ⬇️
+➤ models/User.js (talks to MongoDB)
+
+file order
+
+- We’re now entering Task Manager Core Features territory
+
+Step 1: Create Task.js model file
+Path: server/models/Task.js
+Purpose: Define the schema (structure) of a task (title, description, status, user ID, etc.)
+this will represent each task stored in MongoDB
+
+🧩 How this fits into the backend:
+Every task will be linked to a user (via user field).
+
+We can later query tasks per user using JWT token.
+
+Timestamps will help show when task was created/updated (very helpful for UI ✨)
+
+
+
+Now we’re diving into Step 2: Task Routes and Controllers – the heart of your Task Manager!
+We’ll handle:
+
+✅ Creating a task
+
+📋 Fetching all tasks of a user
+
+✏️ Updating a task
+
+🗑️ Deleting a task
+
+📁 File 1: server/controllers/taskController.js
+📁 File 2: server/routes/taskRoutes.js
+
+
+
+📁 Update: server/index.js
+👉 Add this line below your existing /api/auth route:
+
+js
+Copy
+Edit
+import taskRoutes from "./routes/taskRoutes.js";
+app.use("/api/tasks", taskRoutes);
+
+
+Create a new file in this path:
+📁 server/middleware/authMiddleware.js
+
+This middleware:
+Verifies the JWT token from the Authorization header.
+
+Adds the userId to req.user so we can use it later in our task controller.
+
+Calls next() if everything is fine, otherwise returns an error.
+
+
+Recap of Route Paths:
+POST /api/register → Register user
+
+POST /api/login → Login user
+
+POST /api/tasks → Create task
+
+GET /api/tasks → Get all tasks
+
+PUT /api/tasks/:id → Update task
+
+DELETE /api/tasks/:id → Delete task
+
+
+ Step 4: Test Task Routes (in order)
+You'll need to login first and use the token from the response in your headers for protected routes. Here's how to test each one:
+
+
+
+// last step 
+
+✅ 1. Create Task
+Method: POST
+URL: http://localhost:5000/api/tasks
+Headers:
+
+pgsql
+Copy
+Edit
+Authorization: Bearer <paste-your-JWT-token-here>
+Content-Type: application/json
+Body (JSON):
+
+json
+Copy
+Edit
+{
+  "title": "Learn React",
+  "description": "Start with hooks and component design"
+}
+
+
+✅ 2. Get All Tasks
+Method: GET
+URL: http://localhost:5000/api/tasks
+Headers:
+
+makefile
+Copy
+Edit
+Authorization: Bearer <your-token>
+
+
+
+✅ 3. Update Task
+First, get a task ID from step 2.
+
+Method: PUT
+URL: http://localhost:5000/api/tasks/<taskId>
+Headers:
+
+pgsql
+Copy
+Edit
+Authorization: Bearer <your-token>
+Content-Type: application/json
+Body:
+
+json
+Copy
+Edit
+{
+  "title": "Learn React (updated)",
+  "description": "Update task to cover advanced hooks"
+}
+
+
+✅ 4. Delete Task
+Method: DELETE
+URL: http://localhost:5000/api/tasks/<taskId>
+Headers:
+
+makefile
+Copy
+Edit
+Authorization: Bearer <your-token>
+
+✅ 5. Get All Tasks
+Method: GET
+URL:
+
+bash
+Copy
+Edit
+http://localhost:5000/api/tasks
+🔐 Headers:
+http
+Copy
+Edit
+Authorization: Bearer <your-login-token>
+Example:
+
+makefile
+Copy
+Edit
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+
+✅ 6. Get a Single Task by ID
+Method: GET
+URL format:
+
+bash
+Copy
+Edit
+http://localhost:5000/api/tasks/<taskId>
+🧪 Example:
+Say your task ID is:
+
+Copy
+Edit
+67f2bfea324f8cada624f5e9
+Then the full URL becomes:
+
+bash
+Copy
+Edit
+http://localhost:5000/api/tasks/67f2bfea324f8cada624f5e9
+🔐 Headers:
+http
+Copy
+Edit
+Authorization: Bearer <your-token>
+
+
+
+✅ 7. Update Task
+Method: PUT
+URL format:
+
+bash
+Copy
+Edit
+http://localhost:5000/api/tasks/<taskId>
+🧪 Example:
+If your task ID is:
+
+Copy
+Edit
+67f2bfea324f8cada624f5e9
+Then the request URL is:
+
+bash
+Copy
+Edit
+http://localhost:5000/api/tasks/67f2bfea324f8cada624f5e9
+🔐 Headers:
+http
+Copy
+Edit
+Authorization: Bearer <your-token>
+Content-Type: application/json
+📦 Body (example):
+json
+Copy
+Edit
+{
+  "title": "Learn React Updated",
+  "description": "Finish useEffect and props explanation",
+  "completed": true
+}
+
+
+sometimes it may does not work when you run in new terminal, at that time just do -> npm install
