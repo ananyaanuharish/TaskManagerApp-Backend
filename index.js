@@ -19,7 +19,7 @@ app.use(express.json());
 // ✅ CORS: allow frontend connection from Vite dev server
 app.use(
   cors({
-    origin: "http://localhost:5173", // your frontend
+    origin:["http://localhost:5173", "https://taskmanagerapp-frontend.onrender.com"], // your frontend
     credentials: true,              // allow cookies/auth headers
   })
 );
